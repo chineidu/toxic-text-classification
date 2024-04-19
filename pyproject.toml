@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "emkademy"
+name = "toxic-classification"
 version = "0.1.0"
 description = ""
 authors = ["Kıvanç Yüksel <emkademy@gmail.com>"]
