@@ -1,0 +1,6 @@
+outs:
+- md5: 9f112e38c1a0495a598f5cb811774ea5.dir
+  size: 7174545
+  nfiles: 1
+  hash: md5
+  path: cyberbully_data

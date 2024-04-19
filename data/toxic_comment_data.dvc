@@ -1,0 +1,6 @@
+outs:
+- md5: c23f9ef172c8f84e78da7baa590c0302.dir
+  size: 134134178
+  nfiles: 3
+  hash: md5
+  path: toxic_comment_data
