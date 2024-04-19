@@ -137,5 +137,3 @@ dmypy.json
 
 # Custom
 /**/service_account/**/*
-dvc remote modify myremote url gs://dvctry
-$ dvc remote modify myremote projectname ml-project-419115

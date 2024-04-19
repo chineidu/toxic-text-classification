@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "toxic-classification"
+name = "toxic-classifier"
 version = "0.1.0"
 description = ""
 authors = ["Chinedu Ezeofor <examplemail.com>"]
@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.10"
-polars = "^0.20.21"
+polars = {extras = ["pyarrow"], version = "^0.20.21"}
 rich = "^13.7.1"
 hydra-core = "^1.3.2"
 fastapi = "^0.110.2"
@@ -17,12 +17,19 @@ pre-commit = "^3.7.0"
 dvc = "^3.50.0"
 dvc-gs = "^3.0.1"
 certifi = "^2024.2.2"
+pandas = "^2.2.2"
+typeguard = "^4.2.1"
+scikit-learn = "^1.4.2"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.9.0"
 ruff = "^0.4.0"
 pytest = "^8.1.1"
 watermark = "^2.4.3"
+ipykernel = "^6.29.4"
+jupyter = "^1.0.0"
+matplotlib = "^3.8.4"
+nb-black-formatter = "^1.0.1"
 
 [tool.mypy]
 mypy_path = ["fast_token_classifier"]

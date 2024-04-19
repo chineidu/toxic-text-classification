@@ -24,7 +24,7 @@ repos:
             "--ignore-missing-imports",
             "--disallow-any-generics",
             "--config-file",
-            "./pdf-chat-app/pyproject.toml",
+            "./pyproject.toml",
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
