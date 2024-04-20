@@ -63,5 +63,7 @@ class PrepareData:
         """This is used to clean the data."""
         data: pl.DataFrame = self.concat_data()
         cleaner: DataCleaner = DataCleaner(data)
-        data = cleaner.prepare_data()
+        data = cleaner.prepare_data().sample(fraction=1, seed=config.constants.seed)
+        # Re-arrange the columns
+        data = data.select(config.data_cleaner.column_names)
         return data

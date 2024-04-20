@@ -1,50 +1,48 @@
+# Base image
 FROM python:3.10-slim
 
-ARG USER_ID
-ARG USER_NAME
-ENV HOME=/home/${USER_NAME} \
-    VIRTUAL_ENV=/home/${USER_NAME}/venv
+# 1. Disable Python's output buffering. Useful for debugging.
+# 2. Set the environment variables
+# 3. LC_ALL and LANG: ensures that the application can handle Unicode characters correctly.
+# 4. DEBIAN_FRONTEND: prevents interactive prompts during package installations.
+# 5. BUILD_POETRY_LOCK: specify the location of a Poetry lock file.
 ENV \
-  PYTHONUNBUFFERED=1 \
-  DEBIAN_FRONTEND=noninteractive \
-  TZ=Europe/Warsaw \
-  PATH="/usr/local/gcloud/google-cloud-sdk/bin:${HOME}/.local/bin:${VIRTUAL_ENV}/bin:${PATH}" \
-  PYTHONPATH="/app:${PYTHONPATH}" \
-  BUILD_POETRY_LOCK="${HOME}/poetry.lock.build"
+    PYTHONUNBUFFERED=1 \
+    VIRTUAL_ENV="${HOME}/venv" \
+    PATH="${HOME}/venv/bin:${PATH}" \
+    LC_ALL=C.UTF-8 \
+    LANG=C.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    BUILD_POETRY_LOCK="${HOME}/poetry.lock.build"
 
-RUN apt-get -qq update \
-    && apt-get -qq -y install vim gcc curl git build-essential libb64-dev software-properties-common \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get -qq -y clean
+# Set up Poetry for dependency management.
+RUN HOME=/tmp pip install --no-cache-dir poetry==1.7.1
 
-RUN curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-426.0.0-linux-x86_64.tar.gz > /tmp/google-cloud-sdk.tar.gz
-RUN mkdir -p /usr/local/gcloud \
-    && tar -C /usr/local/gcloud -xf /tmp/google-cloud-sdk.tar.gz \
-    && /usr/local/gcloud/google-cloud-sdk/install.sh --usage-reporting false --command-completion true --bash-completion true --path-update true --quiet
 
-RUN addgroup --system --gid ${USER_ID} ${USER_NAME} \
-    && useradd --system -m --no-log-init --home-dir ${HOME} --uid ${USER_ID} --gid ${USER_NAME} --groups ${USER_NAME} ${USER_NAME}
-
-RUN chown -R ${USER_NAME}:${USER_NAME} ${HOME}
-RUN mkdir -p /app && chown -R ${USER_NAME}:${USER_NAME} /app /tmp
-
-RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.7.1
-
-USER ${USER_NAME}
-
-COPY pyproject.toml *.lock /app/
+# 1. Copy the `pyproject.toml` and lock files (e.g. `*.lock`) to the `/app` directory.
+# 2. Set the current working directory to `/app`.
+COPY ./pyproject.toml ./*.lock /app/
 WORKDIR /app
 
-RUN poetry config virtualenvs.create false \
-    && python3.10 -m venv ${VIRTUAL_ENV} \
-    && pip install --upgrade pip setuptools \
-    && poetry install && cp poetry.lock ${BUILD_POETRY_LOCK} \
-    && rm -rf ${HOME}/.cache/*
+# 1. Create a virtual environment,
+# 2. Upgrade the pip package manager
+# 3. Install project dependencies with poetry excluding the root package and dev dependencies.
+# 4. Copy the dependency lock file
+# 5. Clean up the cache directory.
+RUN python -m venv "${VIRTUAL_ENV}" \
+    && pip install --upgrade pip \
+    && poetry install --no-root --no-dev \
+    && poetry run pip install torch==2.2.2 lightning==2.2.2 \
+    && cp poetry.lock "${BUILD_POETRY_LOCK}" \
+    && rm -rf "${HOME}/.cache/*"
 
+# 1. Copy the Docker-related shell scripts to the root directory of the container.
+# 2. Using root privileges, set the appropriate permissions for the scripts.
 USER root
-COPY ./docker/scripts/* /
-RUN chown -R ${USER_NAME} /*.sh && chmod +x /*.sh
-USER ${USER_NAME}
+COPY ./docker/**/*.sh /
+RUN chmod +x /*.sh
 
+# 1. Switch to the directory where the project files are located.
 COPY . /app/
+# Entrypoint to start the MLflow server
 CMD ["/startup-script.sh"]

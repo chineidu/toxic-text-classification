@@ -4,11 +4,13 @@ from pathlib import Path
 import polars as pl
 from typeguard import typechecked
 
+from toxic_classifier import config
+
 
 class DataLoader(ABC):
-    target: str = "hateful_or_vulgar_or_cyberbully"
-    seed: int = 123
-    test_size: float = 0.2
+    target: str = config.constants.target
+    seed: int = config.constants.seed
+    test_size: float = config.constants.test_size
 
     @abstractmethod
     def __init__(self, path: str | Path, separator: str) -> None:

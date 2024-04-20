@@ -1,32 +1,13 @@
 version: "3.8"
 
 services:
-  app:
-    user: "${USER_ID:-1000}"
-    hostname: "${HOST_NAME:-emkademy}"
-    image: cybulde-template
-    platform: linux/amd64
-    container_name: cybulde-template-container
+  app: # 1st service
+    image: toxic-classifier
+    container_name: mtoxic-classifier-app # Also used as hostname
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-      args:
-        USER_NAME: "${USER_NAME:-kyuksel}"
-        USER_ID: "${USER_ID:-1000}"
-    volumes:
-      - ./:/app/
-      - ~/.config/gcloud/:/home/${USER_NAME:-kyuksel}/.config/gcloud
-    ports:
-      - 8080:8080
-
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    ipc: host
-    init: true
-
-
+      context: ./
+      dockerfile: docker/Dockerfile
+    # env_file: # Location of file(s) containing the env vars. Only accessed by the container.
+      # - ./.envs/.postgres
+    # volumes: # Persist the data volume
+      # - postgresql-data:/var/lib/postgresql/data

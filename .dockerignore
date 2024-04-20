@@ -1,7 +1,8 @@
-# We would like to ignore everything, then allow only required files and directories to pass
+# We would like to ignore everything
 *
 
+# Allow only the files/directories listed below
 !docker
-!cybulde
+!toxic_classifier
 !pyproject.toml
 !poetry.lock
