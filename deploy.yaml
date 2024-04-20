@@ -1,0 +1,47 @@
+# A unique identifier for the head node and workers of this cluster.
+cluster_name: data-processor
+
+# The maximum number of workers nodes to launch in addition to the head
+# node.
+max_workers: 4
+
+auth:
+  ssh_user: ubuntu
+
+# If a node is idle for this many minutes, it will be removed.
+idle_timeout_minutes: 5
+
+# Cloud-provider specific configuration.
+provider:
+  project_id: ml-project-419115 # TODO: set your GCP project ID here
+  type: gcp
+  availability_zone: europe-west2-b
+  region: europe-west2
+
+available_node_types:
+  ray_head_default:
+    # The resources provided by this node type.
+    resources: { "CPU": 2 }
+    # Provider-specific config for this node type, e.g. instance type. By default
+    # Ray will auto-configure unspecified fields such as subnets and ssh-keys.
+    # For more documentation on available fields, see:
+    # https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
+    node_config:
+      machineType: e2-medium
+      disks:
+        - boot: true
+          autoDelete: true
+          type: PERSISTENT
+          initializeParams:
+            diskSizeGb: 50
+            # See https://cloud.google.com/compute/docs/images for more images
+            sourceImage: projects/deeplearning-platform-release/global/images/family/common-cpu
+
+setup_commands:
+- sleep 5
+- sudo apt-get update
+- sudo apt-get install -y python3-pip python-is-python3
+- pip install ray[default] numpy pandas rich polars hydra-core
+
+# Specify the node type of the head node (as configured above).
+head_node_type: ray_head_default

@@ -33,7 +33,7 @@ class SpellChecker:
         return sym_spell.lookup_compound(max_edit_distance=2, *args, **kwargs)[0].term
 
 
-class TextDataCleaner:
+class DataCleaner:
     def __init__(self, data: pl.DataFrame) -> None:
         """TextDataCleaner constructor."""
         self.data = data
@@ -57,7 +57,9 @@ class TextDataCleaner:
     def lowercase_and_filter_stopwords(self, data: pl.DataFrame) -> pl.DataFrame:
         """This is used to lowercase and filter stopwords from the data."""
         data = data.with_columns(
-            text=pl.col("text").str.to_lowercase().map_elements(self._remove_stopwords)
+            text=pl.col("text")
+            .str.to_lowercase()
+            .map_elements(self._remove_stopwords, return_dtype=pl.Utf8)
         )
         return data
 
@@ -89,7 +91,9 @@ class TextDataCleaner:
         NB:
         This is a very expensive operation.
         """
-        data = data.with_columns(text=pl.col("text").map_elements(self._spell_correct))
+        data = data.with_columns(
+            text=pl.col("text").map_elements(self._spell_correct, return_dtype=pl.Utf8)
+        )
         return data
 
     @typechecked

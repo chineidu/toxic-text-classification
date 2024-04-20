@@ -21,6 +21,8 @@ pandas = "^2.2.2"
 typeguard = "^4.2.1"
 scikit-learn = "^1.4.2"
 spacy = "^3.7.4"
+ray = {extras = ["default"], version = "^2.11.0"}
+google-api-python-client = "^2.126.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.9.0"

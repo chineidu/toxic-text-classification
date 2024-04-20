@@ -1,5 +1,22 @@
+assign_split:
+  seed: 123
+  test_size: 0.2
+  target: hateful_or_vulgar_or_cyberbully
+
 data_cleaner:
   column_names:
     - text
     - dataset
-    - hateful_or_vulgar_or_cyberbully
+    - ${assign_split.target}
+data_paths:
+  gabe_hate_corpus:
+    path: ghc_data/**/*.tsv
+    separator: "\t"
+  cyberbully:
+    path: cyberbully_data/cyberbullying_tweets.csv
+    separator: ","
+  toxic_comments:
+    path: toxic_comment_data/train.csv
+    labels_path: toxic_comment_data/test_labels.csv
+    other_path: toxic_comment_data/test.csv
+    separator: ","

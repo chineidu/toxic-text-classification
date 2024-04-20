@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 import polars as pl
-from sklearn.model_selection import train_test_split
 from typeguard import typechecked
 
 
@@ -11,17 +11,11 @@ class DataLoader(ABC):
     test_size: float = 0.2
 
     @abstractmethod
-    def __init__(
-        self,
-        path: str,
-        separator: str,
-        stratify: bool = True,
-    ) -> None:
+    def __init__(self, path: str | Path, separator: str) -> None:
         """DataLoader constructor."""
 
         self.path = path
         self.separator = separator
-        self.stratify = stratify
 
     def load_data(self) -> pl.DataFrame:
         """This is used to load the data."""
@@ -38,11 +32,6 @@ class DataLoader(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def assign_split(self) -> tuple[pl.DataFrame, pl.DataFrame]:
-        """This is used to assign the train/test split to the data."""
-        raise NotImplementedError()
-
-    @abstractmethod
     def prepare_data(
         self,
     ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
@@ -52,9 +41,9 @@ class DataLoader(ABC):
 
 class GHCDataLoader(DataLoader):
     @typechecked
-    def __init__(self, path: str, separator: str = "\t", stratify: bool = True) -> None:
+    def __init__(self, path: str | Path, separator: str = "\t") -> None:
         """Gabe Hate Corpus DataLoader."""
-        super().__init__(path, separator, stratify)
+        super().__init__(path, separator)
 
     @typechecked
     def load_data(self) -> pl.DataFrame:
@@ -75,45 +64,22 @@ class GHCDataLoader(DataLoader):
         return data
 
     @typechecked
-    def assign_split(
-        self,
-    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+    def prepare_data(self) -> pl.DataFrame:
         data: pl.DataFrame = self.add_target()
-        X: pl.DataFrame = data.drop([self.target])
-        y: pl.DataFrame = data.select([self.target])
-
-        if self.stratify:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=self.test_size, random_state=self.seed, stratify=y
-            )
-            return X_train, X_test, y_train, y_test
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=self.seed
-        )
-        return X_train, X_test, y_train, y_test
-
-    @typechecked
-    def prepare_data(
-        self,
-    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
-        data: pl.DataFrame = self.add_target()
-        X_train, X_test, y_train, y_test = self.assign_split()
-        return X_train, X_test, y_train, y_test
+        return data
 
 
 class ToxicCommentsDataLoader(DataLoader):
     @typechecked
     def __init__(
         self,
-        path: str,
-        separator: str,
-        stratify: bool = True,
-        other_path: None | str = None,
-        labels_path: None | str = None,
+        path: str | Path,
+        separator: str = ",",
+        other_path: None | str | Path = None,
+        labels_path: None | str | Path = None,
     ) -> None:
         """Toxic Comments DataLoader."""
-        super().__init__(path, separator, stratify)
+        super().__init__(path, separator)
         self.other_path = other_path
         self.labels_path = labels_path
 
@@ -208,40 +174,18 @@ class ToxicCommentsDataLoader(DataLoader):
         return toxic_comments_data
 
     @typechecked
-    def assign_split(
-        self,
-    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+    def prepare_data(self) -> pl.DataFrame:
         data: pl.DataFrame = self.concat_data()
         data = data.with_columns(text=pl.col("comment_text"))
         data = data.select(["text", "dataset", self.target])
-        X: pl.DataFrame = data.drop([self.target])
-        y: pl.DataFrame = data.select([self.target])
-
-        if self.stratify:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=self.test_size, random_state=self.seed, stratify=y
-            )
-            return X_train, X_test, y_train, y_test
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=self.seed
-        )
-        return X_train, X_test, y_train, y_test
-
-    @typechecked
-    def prepare_data(
-        self,
-    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
-        data: pl.DataFrame = self.add_target()
-        X_train, X_test, y_train, y_test = self.assign_split()
-        return X_train, X_test, y_train, y_test
+        return data
 
 
 class CyberBullyDataLoader(DataLoader):
     @typechecked
-    def __init__(self, path: str, separator: str, stratify: bool = True) -> None:
+    def __init__(self, path: str | Path, separator: str = ",") -> None:
         """Cyber Bully DataLoader."""
-        super().__init__(path, separator, stratify)
+        super().__init__(path, separator)
 
     @typechecked
     def load_data(self) -> pl.DataFrame:
@@ -266,31 +210,8 @@ class CyberBullyDataLoader(DataLoader):
         return data
 
     @typechecked
-    def assign_split(
-        self,
-    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+    def prepare_data(self) -> pl.DataFrame:
         data: pl.DataFrame = self.add_target()
         data = data.with_columns(text=pl.col("tweet_text"))
         data = data.select(["text", "dataset", self.target])
-
-        X: pl.DataFrame = data.drop([self.target])
-        y: pl.DataFrame = data.select([self.target])
-
-        if self.stratify:
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=self.test_size, random_state=self.seed, stratify=y
-            )
-            return X_train, X_test, y_train, y_test
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=self.seed
-        )
-        return X_train, X_test, y_train, y_test
-
-    @typechecked
-    def prepare_data(
-        self,
-    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
-        data: pl.DataFrame = self.add_target()
-        X_train, X_test, y_train, y_test = self.assign_split()
-        return X_train, X_test, y_train, y_test
+        return data
