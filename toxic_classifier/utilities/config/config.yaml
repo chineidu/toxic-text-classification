@@ -1,0 +1,5 @@
+data_cleaner:
+  column_names:
+    - text
+    - dataset
+    - hateful_or_vulgar_or_cyberbully

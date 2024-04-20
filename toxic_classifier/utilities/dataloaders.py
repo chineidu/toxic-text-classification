@@ -10,7 +10,6 @@ class DataLoader(ABC):
     seed: int = 123
     test_size: float = 0.2
 
-    @typechecked
     @abstractmethod
     def __init__(
         self,
@@ -52,7 +51,8 @@ class DataLoader(ABC):
 
 
 class GHCDataLoader(DataLoader):
-    def __init__(self, path: str, separator: str, stratify: bool = True) -> None:
+    @typechecked
+    def __init__(self, path: str, separator: str = "\t", stratify: bool = True) -> None:
         """Gabe Hate Corpus DataLoader."""
         super().__init__(path, separator, stratify)
 
@@ -103,6 +103,7 @@ class GHCDataLoader(DataLoader):
 
 
 class ToxicCommentsDataLoader(DataLoader):
+    @typechecked
     def __init__(
         self,
         path: str,
@@ -237,6 +238,7 @@ class ToxicCommentsDataLoader(DataLoader):
 
 
 class CyberBullyDataLoader(DataLoader):
+    @typechecked
     def __init__(self, path: str, separator: str, stratify: bool = True) -> None:
         """Cyber Bully DataLoader."""
         super().__init__(path, separator, stratify)
