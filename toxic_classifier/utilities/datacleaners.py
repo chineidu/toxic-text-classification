@@ -8,6 +8,7 @@ from typeguard import typechecked
 class SpellChecker:
     def __init__(self, max_dictionary_edit_distance: int = 2, prefix_length: int = 7) -> None:
         """SymSpellChecker constructor. It uses SymSpellPy to spell check the data."""
+
         self.max_dictionary_edit_distance = max_dictionary_edit_distance
         self.prefix_length = prefix_length
         self.dictionary_path = pkg_resources.resource_filename(
