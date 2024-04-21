@@ -1,3 +1,6 @@
+# Start with:
+# ray up -y filename.yaml --no-config-cache
+
 # A unique identifier for the head node and workers of this cluster.
 cluster_name: data-processor
 
@@ -17,6 +20,11 @@ provider:
   type: gcp
   availability_zone: europe-west2-b
   region: europe-west2
+
+docker:
+  image: chineidu/ray-toxic-classifier:v1
+  container_name: toxic-classifier
+  pull_before_run: True
 
 available_node_types:
   ray_head_default:
@@ -39,9 +47,27 @@ available_node_types:
 
 setup_commands:
 - sleep 5
-- sudo apt-get update
-- sudo apt-get install -y python3-pip python-is-python3
-- pip install ray[default] numpy pandas rich polars hydra-core
+# - sudo apt-get update
+# - sudo apt-get install -y python3-pip python-is-python3
+# - pip install ray[default] numpy pandas rich polars hydra-core
 
 # Specify the node type of the head node (as configured above).
 head_node_type: ray_head_default
+
+# Command to start ray on the head node. You don't need to change this.
+head_start_ray_commands:
+    - ray stop
+    - >-
+      ray start
+      --head
+      --port=6379
+      --object-manager-port=8076
+      --autoscaling-config=~/ray_bootstrap_config.yaml
+
+# Command to start ray on worker nodes. You don't need to change this.
+worker_start_ray_commands:
+    - ray stop
+    - >-
+      ray start
+      --address=$RAY_HEAD_IP:6379
+      --object-manager-port=8076

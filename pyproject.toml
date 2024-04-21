@@ -3,7 +3,6 @@ name = "toxic-classifier"
 version = "0.1.0"
 description = ""
 authors = ["Chinedu Ezeofor <examplemail.com>"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.10"
@@ -31,8 +30,6 @@ ipykernel = "^6.29.4"
 jupyter = "^1.0.0"
 matplotlib = "^3.8.4"
 nb-black-formatter = "^1.0.1"
-symspellpy = "^6.7.7"
-types-setuptools = "^69.5.0.20240415"
 
 [tool.mypy]
 mypy_path = ["fast_token_classifier"]

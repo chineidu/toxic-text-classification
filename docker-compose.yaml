@@ -2,12 +2,16 @@ version: "3.8"
 
 services:
   app: # 1st service
-    image: toxic-classifier
-    container_name: mtoxic-classifier-app # Also used as hostname
+    image: ray-toxic-classifier:v2
+    container_name: toxic-classifier-app # Also used as hostname
     build:
       context: ./
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/Dockerfile.ray
     # env_file: # Location of file(s) containing the env vars. Only accessed by the container.
       # - ./.envs/.postgres
-    # volumes: # Persist the data volume
+    volumes: # Persist the data volume
+      - .:/app
       # - postgresql-data:/var/lib/postgresql/data
+    ports:
+      - 8265:8265
+    shm_size: '2.28gb' # Increase shared memory
