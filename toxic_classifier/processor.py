@@ -59,11 +59,26 @@ class PrepareData:
         return data
 
     @typechecked
+    @staticmethod
+    def convert_target_columns(data: pl.DataFrame) -> pl.DataFrame:
+        """This is used to convert target columns to numeric."""
+        target: str = config.constants.target
+        data = data.with_columns(
+            pl.when(pl.col(target).eq(True)).then(pl.lit(1)).otherwise(pl.lit(0)).alias(target)
+        )
+        return data
+
+    @typechecked
     def clean_data(self) -> pl.DataFrame:
         """This is used to clean the data."""
         data: pl.DataFrame = self.concat_data()
+        data = self.convert_target_columns(data)
         cleaner: DataCleaner = DataCleaner(data)
         data = cleaner.prepare_data().sample(fraction=1, seed=config.constants.seed)
         # Re-arrange the columns
         data = data.select(config.data_cleaner.column_names)
+        # Remove texts with a single word
+        data = data.with_columns(length=pl.col("cleaned_text").str.len_chars())
+        data = data.filter(pl.col("length").gt(1)).drop("length")
+
         return data

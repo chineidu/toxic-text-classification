@@ -1,0 +1,5 @@
+outs:
+- md5: 4539fe33dfd18ffae941bea9b6f7be92
+  size: 56864013
+  hash: md5
+  path: tokenizer_dataset.txt

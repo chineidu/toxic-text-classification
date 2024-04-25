@@ -18,6 +18,9 @@ scikit-learn = "^1.4.2"
 spacy = "^3.7.4"
 ray = {extras = ["default"], version = "^2.11.0"}
 google-api-python-client = "^2.126.0"
+transformers = "^4.40.0"
+datasets = "^2.19.0"
+tokenizers = "^0.19.1"
 
 [tool.poetry.group.dev.dependencies]
 dvc = "^3.50.0"
@@ -30,6 +33,7 @@ ipykernel = "^6.29.4"
 jupyter = "^1.0.0"
 matplotlib = "^3.8.4"
 nb-black-formatter = "^1.0.1"
+black = "^24.4.0"
 
 [tool.mypy]
 mypy_path = ["fast_token_classifier"]
