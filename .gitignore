@@ -138,4 +138,5 @@ dmypy.json
 # Custom
 /**/service_account/**/*
 notebooks/02-data-cleaners.ipynb
+notebooks/03.ipynb
 test.py
