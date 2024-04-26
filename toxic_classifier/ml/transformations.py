@@ -18,6 +18,8 @@ from toxic_classifier.utilities.utils_io import (
 
 
 class Transformation(ABC):
+    """This is the base class for all transformations."""
+
     @abstractmethod
     def __init__(self, save_directory: str) -> None:
         """This is used to initialize the transformation."""
@@ -30,6 +32,9 @@ class Transformation(ABC):
 
 
 class HuggingFaceTransformation(Transformation):
+    """This is used to load a pretrained HuggingFace tokenizer. The tokenizer tranforms
+    the texts into token ids, attention masks, etc."""
+
     @typechecked
     def __init__(
         self,

@@ -20,6 +20,8 @@ class Backbone(nn.Module):
 
 
 class HuggingFaceBackbone(Backbone):
+    """Load a pretrained or random weights HuggingFace model as backbone."""
+
     def __init__(
         self,
         transformation: Transformation,
