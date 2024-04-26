@@ -4,6 +4,9 @@ from typeguard import typechecked
 
 
 class Head(nn.Module):
+    """Base class for all heads. It's used to defined tasks such as
+    classification or regression."""
+
     pass
 
 

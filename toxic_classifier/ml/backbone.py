@@ -8,6 +8,8 @@ from toxic_classifier.ml.transformations import Transformation
 
 
 class Backbone(nn.Module):
+    """Base class for model backbones. It's used to define models without heads."""
+
     def __init__(self, transformation: Transformation) -> None:
         """This is used to initialize the backbone."""
         super().__init__()
