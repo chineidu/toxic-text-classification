@@ -7,6 +7,7 @@ from typing import Any
 
 import yaml  # type: ignore
 from fsspec import AbstractFileSystem, filesystem
+from typeguard import typechecked
 
 GCS_PREFIX: str = "gs://"
 GCS_FILE_SYSTEM_NAME: str = "gcs"
@@ -14,6 +15,7 @@ LOCAL_FILE_SYSTEM_NAME: str = "file"
 TMP_FILE_PATH: str = "/tmp/"
 
 
+@typechecked
 def choose_file_system(path: str) -> AbstractFileSystem:
     """This is used to choose the appropriate file system based on the path."""
     return (
@@ -23,12 +25,14 @@ def choose_file_system(path: str) -> AbstractFileSystem:
     )
 
 
+@typechecked
 def open_file(path: str, mode: str = "r") -> Any:
     """This is used to open a file based on the path."""
     file_system = choose_file_system(path)
     return file_system.open(path, mode)
 
 
+@typechecked
 def write_yaml_file(yaml_file_path: str, yaml_file_content: dict[Any, Any]) -> None:
     """This is used to write a yaml file."""
     with open_file(yaml_file_path, "w") as yaml_file:
@@ -42,6 +46,7 @@ def is_dir(path: str) -> bool:
     return is_dir
 
 
+@typechecked
 def is_file(path: str) -> bool:
     """This is used to check if a path is a file."""
     file_system = choose_file_system(path)
@@ -49,12 +54,14 @@ def is_file(path: str) -> bool:
     return is_file
 
 
+@typechecked
 def make_dirs(path: str) -> None:
     """This is used to make directories recursively."""
     file_system = choose_file_system(path)
     file_system.makedirs(path, exist_ok=True)
 
 
+@typechecked
 def list_paths(path: str) -> list[str]:
     """This is used to list paths in a directory."""
     file_system = choose_file_system(path)
@@ -67,6 +74,7 @@ def list_paths(path: str) -> list[str]:
     return paths
 
 
+@typechecked
 def copy_dir(source_dir: str, target_dir: str) -> None:
     """This is used to copy a directory recursively."""
     if not is_dir(target_dir):
@@ -85,6 +93,7 @@ def copy_dir(source_dir: str, target_dir: str) -> None:
             raise ValueError(f"Source file {source_file} is not a file.")
 
 
+@typechecked
 def translate_gcs_dir_to_local(path: str) -> str:
     """This is used to translate a GCS path to a local path for processing."""
     if path.startswith(GCS_PREFIX):
