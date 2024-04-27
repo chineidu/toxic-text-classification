@@ -159,6 +159,7 @@ class MLPLayer(Adapter):
 
 
 class MLPWithPooling(Adapter):
+    @typechecked
     def __init__(
         self,
         output_feature_sizes: list[int],
@@ -204,6 +205,7 @@ class MLPWithPooling(Adapter):
         else:
             self.get_output_tensor = nn.Identity()  # type: ignore
 
+    @typechecked
     def forward(self, backbone_output: BaseModelOutputWithPooling) -> Tensor:
         """Forward pass through MLP layers and pooling."""
         output: Tensor = self.get_output_tensor(backbone_output)
@@ -213,6 +215,7 @@ class MLPWithPooling(Adapter):
         return output
 
 
+@typechecked
 def mean_pool_tokens(tensor: Tensor) -> Tensor:
     """Average pool the token embeddings of the last hidden state."""
     dims: int = len(tensor.shape)
@@ -221,6 +224,7 @@ def mean_pool_tokens(tensor: Tensor) -> Tensor:
     return torch.mean(tensor, dim=1)
 
 
+@typechecked
 def cls_pool_tokens(tensor: Tensor) -> Tensor:
     """
     Pools the token embeddings by taking the first token (usually the [CLS] token) from
