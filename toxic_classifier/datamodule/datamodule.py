@@ -7,7 +7,7 @@ from typeguard import typechecked
 from toxic_classifier.datamodule.dataset import TextDataset
 
 
-class DataModule(l.LightningDataModule):
+class BaseDataModule(l.LightningDataModule):
     """
     This is the base class for all DataModules.
     """
@@ -42,7 +42,7 @@ class DataModule(l.LightningDataModule):
         )
 
 
-class TextDataModule(DataModule):
+class TextDataModule(BaseDataModule):
     """This is used to load the data."""
 
     @typechecked

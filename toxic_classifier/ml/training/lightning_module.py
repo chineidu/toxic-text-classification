@@ -19,7 +19,7 @@ from toxic_classifier.ml.transformations import Transformation
 from toxic_classifier.utilities.torch_utils import plot_confusion_matrix
 
 
-class BaseLightiningModule(l.LightningModule):
+class BaseLightningModule(l.LightningModule):
     """This is the base class for all Lightning models."""
 
     def __init__(
@@ -76,7 +76,7 @@ class BaseLightiningModule(l.LightningModule):
         raise NotImplementedError
 
 
-class BinaryTextClassificationLightningModule(BaseLightiningModule):
+class BinaryTextClassificationLightningModule(BaseLightningModule):
     """This is used to create a Lightning Model for binary text classification."""
 
     @typechecked

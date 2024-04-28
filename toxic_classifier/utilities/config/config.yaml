@@ -21,3 +21,8 @@ data_paths:
     labels_path: toxic_comment_data/test_labels.csv
     other_path: toxic_comment_data/test.csv
     separator: ","
+
+mlflow:
+  experiment_name: null
+  run_id: null
+  run_name: null

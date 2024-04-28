@@ -1,3 +1,8 @@
+"""This module contains the utility functions for the project.
+
+Copied from https://github.com/emkademy/cybulde-model/blob/main/cybulde/utils/torch_utils.py
+"""
+
 import itertools
 import os
 from typing import Any
