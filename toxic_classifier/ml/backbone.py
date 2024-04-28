@@ -4,27 +4,27 @@ from torch import nn
 from transformers import AutoConfig, AutoModel, BatchEncoding
 from transformers.modeling_outputs import BaseModelOutputWithPooling
 
-from toxic_classifier.ml.transformations import Transformation
+from toxic_classifier.ml.transformations import BaseTransformation
 
 
-class Backbone(nn.Module):
+class BaseBackbone(nn.Module):
     """Base class for model backbones. It's used to define models without heads."""
 
-    def __init__(self, transformation: Transformation) -> None:
+    def __init__(self, transformation: BaseTransformation) -> None:
         """This is used to initialize the backbone."""
         super().__init__()
         self.transformation = transformation
 
-    def get_transformation(self) -> Transformation:
+    def get_transformation(self) -> BaseTransformation:
         return self.transformation
 
 
-class HuggingFaceBackbone(Backbone):
+class HuggingFaceBackbone(BaseBackbone):
     """Load a pretrained or random weights HuggingFace model as backbone."""
 
     def __init__(
         self,
-        transformation: Transformation,
+        transformation: BaseTransformation,
         pretrained_model_name_or_path: str,
         pretrained: bool,
     ) -> None:

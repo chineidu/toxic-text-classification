@@ -140,3 +140,4 @@ dmypy.json
 notebooks/02-data-cleaners.ipynb
 notebooks/03.ipynb
 test.py
+**/mlruns/**/*

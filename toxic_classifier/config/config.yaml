@@ -22,7 +22,12 @@ data_paths:
     other_path: toxic_comment_data/test.csv
     separator: ","
 
+models:
+  transformations:
+    save_directory: notebooks/tokenizers
+  backbone:
+    save_directory: notebooks/tokenizers
 mlflow:
-  experiment_name: null
+  experiment_name: test-experiment
   run_id: null
   run_name: null

@@ -1,6 +1,8 @@
 from typing import Any, Callable
 
 import lightning as l
+import numpy as np
+import numpy.typing as npt
 from torch.utils.data import DataLoader, Dataset, random_split
 from typeguard import typechecked
 
@@ -48,8 +50,8 @@ class TextDataModule(BaseDataModule):
     @typechecked
     def __init__(
         self,
-        feature_column: str,
-        label_column: str,
+        features: npt.NDArray[np.float_] | Any,
+        labels: npt.NDArray[np.float_],
         batch_size: int,
         shuffle: bool = False,
         num_workers: int = 0,
@@ -60,8 +62,8 @@ class TextDataModule(BaseDataModule):
         super().__init__(
             batch_size, shuffle, num_workers, collate_fn, drop_last, persistent_workers
         )
-        self.feature_column = feature_column
-        self.label_column = label_column
+        self.features = features
+        self.labels = labels
 
     @typechecked
     def prepare_data(self) -> None:
@@ -70,10 +72,13 @@ class TextDataModule(BaseDataModule):
 
     @typechecked
     def setup(self, stage: str) -> None:
-        text_data: Dataset = TextDataset(features=self.feature_column, labels=self.label_column)
+        text_data: Dataset = TextDataset(features=self.features, labels=self.labels)
         size_a: int = int(len(text_data) * 0.85)
         size_b: int = len(text_data) - size_a
         train_data, test_data = random_split(dataset=text_data, lengths=[size_a, size_b])
+
+        size_a: int = int(len(train_data) * 0.85)  # type: ignore
+        size_b: int = len(train_data) - size_a  # type: ignore
         train_data, val_data = random_split(dataset=train_data, lengths=[size_a, size_b])
         if stage == "fit" or stage is None:
             self.train_data = train_data

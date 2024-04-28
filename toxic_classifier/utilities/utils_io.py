@@ -1,5 +1,5 @@
 """This is used to manage IO operations.
-Copied!
+Copied: https://github.com/emkademy/cybulde-model/blob/main/cybulde/utils/gcp_utils.py
 """
 
 import os
@@ -47,8 +47,10 @@ def is_dir(path: str) -> bool:
 
 
 @typechecked
-def is_file(path: str) -> bool:
+def is_file(path: str | None) -> bool:
     """This is used to check if a path is a file."""
+    if path is None:
+        return False
     file_system = choose_file_system(path)
     is_file: bool = file_system.isfile(path)
     return is_file

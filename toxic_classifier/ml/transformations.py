@@ -17,7 +17,7 @@ from toxic_classifier.utilities.utils_io import (
 )
 
 
-class Transformation(ABC):
+class BaseTransformation(ABC):
     """This is the base class for all transformations."""
 
     @abstractmethod
@@ -31,7 +31,7 @@ class Transformation(ABC):
         raise NotImplementedError()
 
 
-class HuggingFaceTransformation(Transformation):
+class HuggingFaceTransformation(BaseTransformation):
     """This is used to load a pretrained HuggingFace tokenizer. The tokenizer tranforms
     the texts into token ids, attention masks, etc."""
 
@@ -72,5 +72,6 @@ class HuggingFaceTransformation(Transformation):
             truncation=self.truncation,
             padding=self.padding,
             max_length=self.max_length,
+            return_tensors="pt",
         )
         return output

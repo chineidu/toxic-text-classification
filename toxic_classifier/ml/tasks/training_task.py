@@ -23,8 +23,8 @@ class BaseTrainingTask(ABC):
         datamodule: BaseDataModule,
         lightning_module: BaseLightningModule,
         trainer: Trainer,
-        best_training_checkpoint_path: str,
-        last_training_checkpoint_path: str,
+        best_training_checkpoint_path: str | None,
+        last_training_checkpoint_path: str | None,
     ):
         self.name = name
         self.datamodule = datamodule
@@ -49,8 +49,8 @@ class TrainingTask(BaseTrainingTask):
         datamodule: BaseDataModule,
         lightning_module: BaseLightningModule,
         trainer: Trainer,
-        best_training_checkpoint_path: str,
-        last_training_checkpoint_path: str,
+        best_training_checkpoint_path: str | None,
+        last_training_checkpoint_path: str | None,
     ):
         super().__init__(
             name,
@@ -64,9 +64,9 @@ class TrainingTask(BaseTrainingTask):
     @typechecked
     def run(self, config: DictConfig) -> None:
         """This is used to run the training task."""
-        experiment_name: str = config.mlflow.experiment_name
-        run_id: str = config.mlflow.run_id
-        run_name: str = config.mlflow.run_name
+        experiment_name: str | None = config.mlflow.experiment_name
+        run_id: str | None = config.mlflow.run_id
+        run_name: str | None = config.mlflow.run_name
 
         with activate_mlflow(
             experiment_name=experiment_name, run_id=run_id, run_name=run_name

@@ -7,16 +7,16 @@ from torch import Tensor, nn
 from typeguard import typechecked
 
 
-class LossFunction(nn.Module):
+class BaseLossFunction(nn.Module):
     pass
 
 
-class BinaryCrossEntropyLoss(LossFunction):
+class BinaryCrossEntropyLoss(BaseLossFunction):
     @typechecked
     def __init__(self, reduction: Literal["none", "mean", "sum"] = "none") -> None:
         super().__init__()
         self.reduction = reduction
-        self.criterion = F.binary_cross_entropy_with_logits()
+        self.criterion = F.binary_cross_entropy_with_logits
 
     @typechecked
     def forward(self, input: Tensor, target: Tensor, pos_weight: Tensor | None = None) -> Tensor:

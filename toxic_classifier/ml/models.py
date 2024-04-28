@@ -3,9 +3,9 @@ from transformers import BatchEncoding
 from typeguard import typechecked
 
 from toxic_classifier.ml.adapters import Adapter
-from toxic_classifier.ml.backbone import Backbone
+from toxic_classifier.ml.backbone import BaseBackbone
 from toxic_classifier.ml.head import Head
-from toxic_classifier.ml.transformations import Transformation
+from toxic_classifier.ml.transformations import BaseTransformation
 
 
 class Model(nn.Module):
@@ -16,7 +16,7 @@ class BinaryTextClassifier(Model):
     """This is used to define a binary text classifier."""
 
     @typechecked
-    def __call__(self, backbone: Backbone, head: Head, adapter: Adapter | None = None) -> None:
+    def __init__(self, backbone: BaseBackbone, head: Head, adapter: Adapter | None = None) -> None:
         super().__init__()
 
         self.backbone = backbone
@@ -33,6 +33,6 @@ class BinaryTextClassifier(Model):
         return output
 
     @typechecked
-    def get_transformation(self) -> Transformation:
+    def get_transformation(self) -> BaseTransformation:
         """This is used to get the transformation of the backbone."""
         return self.backbone.get_transformation()

@@ -13,9 +13,9 @@ from torch.optim import Optimizer
 from transformers import BatchEncoding
 from typeguard import typechecked
 
-from toxic_classifier.ml.training.lightning_schedulers import LightningScheduler
-from toxic_classifier.ml.training.loss_functions import LossFunction
-from toxic_classifier.ml.transformations import Transformation
+from toxic_classifier.ml.training.lightning_schedulers import BaseLightningScheduler
+from toxic_classifier.ml.training.loss_functions import BaseLossFunction
+from toxic_classifier.ml.transformations import BaseTransformation
 from toxic_classifier.utilities.torch_utils import plot_confusion_matrix
 
 
@@ -25,9 +25,9 @@ class BaseLightningModule(l.LightningModule):
     def __init__(
         self,
         model: nn.Module,
-        loss: LossFunction,
-        optimizer: Optimizer,
-        scheduler: LightningScheduler | None = None,
+        loss: BaseLossFunction,
+        optimizer: Optimizer | Any,
+        scheduler: BaseLightningScheduler | None = None,
     ) -> None:
         super().__init__()
 
@@ -39,7 +39,10 @@ class BaseLightningModule(l.LightningModule):
         self.model_size = self._calculate_model_size()
 
     def _calculate_model_size(self) -> float:
-        """This is used to calculate the model size."""
+        """This is used to calculate the model size.
+
+        Source: https://discuss.pytorch.org/t/finding-model-size/130275
+        """
         param_size: int = 0
         for param in self.parameters():
             param_size += param.nelement() & param.element_size()
@@ -83,9 +86,9 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
     def __init__(
         self,
         model: nn.Module,
-        loss: LossFunction,
-        optimizer: Optimizer,
-        scheduler: LightningScheduler | None = None,
+        loss: BaseLossFunction,
+        optimizer: Optimizer | Any,
+        scheduler: BaseLightningScheduler | None = None,
     ) -> None:
         super().__init__(model, loss, optimizer, scheduler)
 
@@ -98,8 +101,9 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
         self.training_f1_score = torchmetrics.F1Score("binary")
         self.training_f1_score = torchmetrics.F1Score("binary")
 
-        self.train_step_outputs: dict[str, Any] = defaultdict(list)
-        self.validation_step_outputs: dict[str, Any] = defaultdict(list)
+        # Empty dict[str, list[Any]] to store outputs from training and validation steps
+        self.train_step_outputs: dict[str, list[Any]] = defaultdict(list)
+        self.validation_step_outputs: dict[str, list[Any]] = defaultdict(list)
 
         self.pos_weight: Tensor | None = None
 
@@ -123,7 +127,7 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
         logits: Tensor = self(features)
 
         # loss
-        loss: LossFunction = self.loss(logits, labels, self.pos_weight)
+        loss: BaseLossFunction = self.loss(logits, labels, self.pos_weight)
 
         return loss, logits, labels
 
@@ -230,5 +234,5 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
         return {"loss": loss, "predictions": logits, "labels": labels}
 
     @typechecked
-    def get_transformation(self) -> Transformation:
+    def get_transformation(self) -> BaseTransformation:
         return self.model.get_transformation()

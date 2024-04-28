@@ -11,7 +11,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 from typeguard import typechecked
 
 
-class LightningScheduler(ABC):
+class BaseLightningScheduler(ABC):
     """Abstract base class for all schedulers."""
 
     def __init__(
@@ -35,7 +35,7 @@ class LightningScheduler(ABC):
         raise NotImplementedError
 
 
-class LightningLRScheduler(LightningScheduler):
+class LightningLRScheduler(BaseLightningScheduler):
     """This is used to create a Lightning Scheduler."""
 
     @typechecked
