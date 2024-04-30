@@ -26,7 +26,7 @@ models:
   transformations:
     save_directory: notebooks/tokenizers
   backbone:
-    save_directory: notebooks/tokenizers
+    save_directory: prajjwal1/bert-tiny
 mlflow:
   experiment_name: test-experiment
   run_id: null

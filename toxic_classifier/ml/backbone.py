@@ -13,6 +13,7 @@ class BaseBackbone(nn.Module):
     def __init__(self, transformation: BaseTransformation) -> None:
         """This is used to initialize the backbone."""
         super().__init__()
+
         self.transformation = transformation
 
     def get_transformation(self) -> BaseTransformation:
@@ -29,6 +30,7 @@ class HuggingFaceBackbone(BaseBackbone):
         pretrained: bool,
     ) -> None:
         super().__init__(transformation)
+
         self.backbone = self.get_backbone(pretrained_model_name_or_path, pretrained)
 
     def forward(self, encodings: BatchEncoding) -> BaseModelOutputWithPooling:

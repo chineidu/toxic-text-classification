@@ -2,6 +2,7 @@
 
 import os
 from abc import ABC, abstractmethod
+from typing import Any
 
 from transformers import (
     AutoTokenizer,
@@ -31,21 +32,14 @@ class BaseTransformation(ABC):
         raise NotImplementedError()
 
 
-class HuggingFaceTransformation(BaseTransformation):
+class HuggingFaceTokenizationTransformation(BaseTransformation):
     """This is used to load a pretrained HuggingFace tokenizer. The tokenizer tranforms
     the texts into token ids, attention masks, etc."""
 
     @typechecked
-    def __init__(
-        self,
-        save_directory: str,
-        truncation: bool = True,
-        padding: bool = True,
-        max_length: int = 80,
-    ) -> None:
+    def __init__(self, save_directory: str, max_length: int = 80) -> None:
         super().__init__(save_directory)
-        self.truncation = truncation
-        self.padding = padding
+
         self.max_length = max_length
 
     @typechecked
@@ -65,12 +59,12 @@ class HuggingFaceTransformation(BaseTransformation):
         return tokenizer
 
     @typechecked
-    def __call__(self, texts: list[str]) -> BatchEncoding:
+    def __call__(self, texts: list[str] | Any) -> BatchEncoding:
         tokenizer: PreTrainedTokenizerBase = self.init_tokenizer()
         output: BatchEncoding = tokenizer(
             texts,
-            truncation=self.truncation,
-            padding=self.padding,
+            truncation=True,
+            padding=True,
             max_length=self.max_length,
             return_tensors="pt",
         )

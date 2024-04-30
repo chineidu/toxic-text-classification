@@ -1,3 +1,5 @@
+from typing import Any
+
 from torch import Tensor, nn
 from typeguard import typechecked
 
@@ -18,7 +20,7 @@ class BinaryClassifierHead(Head):
         self.head = nn.Sequential(nn.Linear(in_features, out_features), nn.Sigmoid())
 
     @typechecked
-    def forward(self, features: Tensor) -> Tensor:
+    def forward(self, features: Tensor | Any) -> Tensor:
         """Forward pass of the binary classification head."""
         output: Tensor = self.head(features)
         return output

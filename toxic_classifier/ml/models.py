@@ -1,3 +1,5 @@
+from typing import Any
+
 from torch import Tensor, nn
 from transformers import BatchEncoding
 from typeguard import typechecked
@@ -16,7 +18,12 @@ class BinaryTextClassifier(Model):
     """This is used to define a binary text classifier."""
 
     @typechecked
-    def __init__(self, backbone: BaseBackbone, head: Head, adapter: Adapter | None = None) -> None:
+    def __init__(
+        self,
+        backbone: BaseBackbone | Any,
+        head: Head | Any,
+        adapter: Adapter | None = None,
+    ) -> None:
         super().__init__()
 
         self.backbone = backbone
@@ -24,12 +31,12 @@ class BinaryTextClassifier(Model):
         self.adapter = adapter
 
     @typechecked
-    def forward(self, encodings: BatchEncoding) -> Tensor:
+    def forward(self, encodings: BatchEncoding | Any) -> Tensor:
         """This is used to apply the backbone, the adapter and the head."""
-        features = self.backbone(encodings)
-        if self.adapter:
-            features = self.adapter(features)
-        output = self.head(features)
+        output: Tensor = self.backbone(encodings).pooler_output
+        if self.adapter is not None:
+            output = self.adapter(output)
+        output = self.head(output).squeeze()
         return output
 
     @typechecked

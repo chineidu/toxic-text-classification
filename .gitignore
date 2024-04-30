@@ -137,7 +137,8 @@ dmypy.json
 
 # Custom
 /**/service_account/**/*
+**/mlruns/**/*
+**/lightning_logs/**/*
 notebooks/02-data-cleaners.ipynb
 notebooks/03.ipynb
 test.py
-**/mlruns/**/*

@@ -3,10 +3,20 @@ from typing import Any, Callable
 import lightning as l
 import numpy as np
 import numpy.typing as npt
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch import Tensor
+from torch.utils.data import (
+    BatchSampler,
+    DataLoader,
+    Dataset,
+    Sampler,
+    default_collate,
+    random_split,
+)
+from transformers import BatchEncoding
 from typeguard import typechecked
 
 from toxic_classifier.datamodule.dataset import TextDataset
+from toxic_classifier.ml.transformations import HuggingFaceTokenizationTransformation
 
 
 class BaseDataModule(l.LightningDataModule):
@@ -17,14 +27,19 @@ class BaseDataModule(l.LightningDataModule):
     def __init__(
         self,
         batch_size: int,
-        shuffle: bool = False,
+        sampler: Sampler | None = None,
+        batch_sampler: BatchSampler | None = None,
         num_workers: int = 0,
         collate_fn: Callable[[Any], Any] | None = None,
+        shuffle: bool = False,
         drop_last: bool = False,
         persistent_workers: bool = False,
     ) -> None:
         super().__init__()
+
         self.batch_size = batch_size
+        self.sampler = sampler
+        self.batch_sampler = batch_sampler
         self.shuffle = shuffle
         self.num_workers = num_workers
         self.collate_fn = collate_fn
@@ -50,19 +65,34 @@ class TextDataModule(BaseDataModule):
     @typechecked
     def __init__(
         self,
-        features: npt.NDArray[np.float_] | Any,
+        text_features: list[str],
         labels: npt.NDArray[np.float_],
         batch_size: int,
-        shuffle: bool = False,
+        transformation: HuggingFaceTokenizationTransformation,
+        sampler: Sampler | None = None,
+        batch_sampler: BatchSampler | None = None,
         num_workers: int = 0,
-        collate_fn: Callable[[Any], Any] | None = None,
+        shuffle: bool = False,
         drop_last: bool = False,
         persistent_workers: bool = False,
     ) -> None:
+        def tokenization_collate_fn(batch: list[tuple[str, int]]) -> tuple[BatchEncoding, Tensor]:
+            """This is used to collate the tokenized texts."""
+            texts, labels = default_collate(batch)
+            encodings = transformation(texts)
+            return encodings, labels
+
         super().__init__(
-            batch_size, shuffle, num_workers, collate_fn, drop_last, persistent_workers
+            batch_size=batch_size,
+            sampler=sampler,
+            batch_sampler=batch_sampler,
+            num_workers=num_workers,
+            collate_fn=tokenization_collate_fn,
+            shuffle=shuffle,
+            drop_last=drop_last,
+            persistent_workers=persistent_workers,
         )
-        self.features = features
+        self.features = text_features
         self.labels = labels
 
     @typechecked
@@ -72,7 +102,7 @@ class TextDataModule(BaseDataModule):
 
     @typechecked
     def setup(self, stage: str) -> None:
-        text_data: Dataset = TextDataset(features=self.features, labels=self.labels)
+        text_data: Dataset = TextDataset(text_features=self.features, labels=self.labels)
         size_a: int = int(len(text_data) * 0.85)
         size_b: int = len(text_data) - size_a
         train_data, test_data = random_split(dataset=text_data, lengths=[size_a, size_b])

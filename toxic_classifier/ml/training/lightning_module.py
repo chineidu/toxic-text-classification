@@ -7,9 +7,11 @@ from typing import Any
 import lightning as l
 import mlflow
 import torch
-import torchmetrics
+
+# from torchmetrics.classification import BinaryConfusionMatrix
 from torch import Tensor, nn
 from torch.optim import Optimizer
+from torchmetrics import AUROC, Accuracy, ConfusionMatrix, F1Score
 from transformers import BatchEncoding
 from typeguard import typechecked
 
@@ -92,14 +94,17 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
     ) -> None:
         super().__init__(model, loss, optimizer, scheduler)
 
-        self.training_accuracy = torchmetrics.Accuracy("binary")
-        self.training_accuracy = torchmetrics.Accuracy("binary")
+        self.training_accuracy = Accuracy("binary")
+        self.validation_accuracy = Accuracy("binary")
 
-        self.training_roc_auc = torchmetrics.AUROC("binary")
-        self.training_roc_auc = torchmetrics.AUROC("binary")
+        self.training_roc_auc = AUROC("binary")
+        self.validation_roc_auc = AUROC("binary")
 
-        self.training_f1_score = torchmetrics.F1Score("binary")
-        self.training_f1_score = torchmetrics.F1Score("binary")
+        self.training_f1_score = F1Score("binary")
+        self.validation_f1_score = F1Score("binary")
+
+        self.training_confusion_matrix = ConfusionMatrix("binary")
+        self.validation_confusion_matrix = ConfusionMatrix("binary")
 
         # Empty dict[str, list[Any]] to store outputs from training and validation steps
         self.train_step_outputs: dict[str, list[Any]] = defaultdict(list)
@@ -127,7 +132,7 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
         logits: Tensor = self(features)
 
         # loss
-        loss: BaseLossFunction = self.loss(logits, labels, self.pos_weight)
+        loss: Tensor = self.loss(logits, labels, self.pos_weight).mean()
 
         return loss, logits, labels
 
@@ -159,7 +164,7 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
     def training_step(self, batch: Any, batch_idx: int) -> Tensor:
         # Compute the loss, logits, and labels
         loss, logits, labels = self._shared_steps(batch)
-        self.log("training_loss", loss)
+        self.log("training_loss", loss, sync_dist=True)
 
         # Accuracy
         self.training_accuracy(logits, labels)
@@ -198,7 +203,7 @@ class BinaryTextClassificationLightningModule(BaseLightningModule):
     def validation_step(self, batch: Any, batch_idx: int) -> dict[str, Any]:
         # Compute the loss, logits, and labels
         loss, logits, labels = self._shared_steps(batch)
-        self.log("validation_loss", loss)
+        self.log("validation_loss", loss, sync_dist=True)
 
         # Accuracy
         self.validation_accuracy(logits, labels)
