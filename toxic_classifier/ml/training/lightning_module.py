@@ -7,8 +7,6 @@ from typing import Any
 import lightning as l
 import mlflow
 import torch
-
-# from torchmetrics.classification import BinaryConfusionMatrix
 from torch import Tensor, nn
 from torch.optim import Optimizer
 from torchmetrics import AUROC, Accuracy, ConfusionMatrix, F1Score
